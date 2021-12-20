@@ -1,0 +1,164 @@
+file ec2
+-------
+provider "aws" {
+  region     = "us-west-2"
+  access_key = "my-access-key"
+  secret_key = "my-secret-key"
+}
+
+
+
+resource "aws_instance" "ec2" {
+  ami           = 
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "HelloWorld"
+  }
+}
+
+__________________________________________________________________________________________________________
+file ec2
+--------
+
+provider "aws" {
+  region     = "ap-south-1"
+  access_key = var.akey
+  secret_key = var.skey
+}
+
+resource "aws_instance" "myec2" {
+  ami           = "ami-04db49c0fb2215364"
+  instance_type = var.type
+  key_name      = var.key
+  count         = var.num
+
+  tags = {
+    Name        = "Linux"
+    BU          = "Net"
+    App         = "web"
+    Environment = "Devops"
+  }
+}
+
+-------------------------------------------------------------------------------------
+
+file name  :  var.tf
+---------------
+variable "type" {
+  type        = string
+  default     = "t2.micro"
+  description = "Ec2 Instance"
+}
+
+variable "key" {
+  type        = string
+  default     = "project"
+  description = "Instance key"
+}
+
+variable "num" {
+  type        = number
+  description = "No of Instances"
+}
+
+variable "akey" {
+  type        = string
+  description = "accesskey"
+}
+
+variable "skey" {
+  type        = string
+  description = "secretkay"
+}
+----------------------------------------------------------------------------------------------------------
+file name : terraform.tfvars
+--------------------------
+num  = 2
+akey = "write your accesskey"
+skey = "write your secret accesskey"
+--------------------------------------------------------------------------------------------------------------------
+
+ $terraform destroy -auto-approve
+ $terraform show |grep state
+ $terraform fmt
+
+-------------------------
+ $terraform plan -out (varplan-your choice) -var="num=2" -var="akey=type accesskey" -var="skey=type secret accesskey --->
+This is at the time plan out you give your choice ,that is in file what is you give it will change and create
+in this commanmd only.
+
+---------------------------
+       $git init
+       $ls
+       $git status
+       $clear
+      $vi .gitignore
+      write *.tfvars  and save it :wq
+
+===============================================================================================
+vi main.tf
+--------
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.27"
+    }
+  }
+
+  required_version = ">= 0.14.9"
+}
+
+provider "aws" {
+  profile = "default"
+  region  = "us-west-2"
+}
+
+resource "aws_instance" "cisco_academy" {
+  ami           = "ami-830c94e3"
+  instance_type = var.type
+  count         = length(var.instance_name)
+
+  tags = {
+    Name = var.instance_name[count.index]
+  }
+}
+
+
+output "instance_details" {
+  value       = aws_instance.cisco_academy[0].arn
+  description = "The Id of the resource group"
+}
+============================================================================================
+
+for the above main.tf file the variables are
+vi variable.tf
+
+variable "instance_name" {
+  description = "Value of the Name tag for the EC2 instance"
+  type        = list(string)
+  default     = ["Router", "Switch", "L3Switch"]
+}
+
+
+variable "type" {
+  type = "t2.micro"
+}
+
+===================================================
+Terraform statefile store in s3
+Backend :
+-----
+vi backend.tf
+--
+terraform {
+  backend "s3" {
+    bucket = "vijay275"
+    key    = "terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
+
+
+
